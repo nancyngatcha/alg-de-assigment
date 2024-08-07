@@ -1,0 +1,9 @@
+application_id,index_prefix,config
+1,shopify_,value1
+2,shopify_store,value2
+,value3
+4,shopify_new,value4
+5,shopify_,value5
+6,shopify_shop,value6
+,value7
+8,shopify_test,value8
