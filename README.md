@@ -1,5 +1,3 @@
-vbnet
-Copier le code
 # Shopify ETL Project
 
 ## Overview
