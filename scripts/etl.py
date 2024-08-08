@@ -45,8 +45,6 @@ def download_csv_from_s3(**kwargs):
         logger.error(f"Download failed: {e}")
         logger.info(f"Download failed. No problem! We can use the mock file instead")
 
-
-
 def transform(**kwargs):
     """
     Read csv file, transform its dataframe and write it into a parquet file
@@ -61,7 +59,6 @@ def transform(**kwargs):
     df_transformed.printSchema()
     df_transformed.write.mode('overwrite').parquet(f"/tmp/data/{execution_date}.parquet")
     logger.info(f"DataFrame written to Parquet file at /tmp/data/{execution_date}.parquet")
-
 
 def load_to_postgres(**kwargs):
     """

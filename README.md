@@ -98,3 +98,14 @@ docker-compose run --rm test
 ```
 ### Test Files
 Ensure test files are placed in the appropriate directories 
+
+### Running Backfill
+
+To run a backfill you have to execute a command in the Webserver container
+```
+docker exec -it <container_id> bash
+```
+And then run the backfill command
+```
+airflow dags backfill -s 2024-08-04 -e 2024-08-07 shopify_etl_temp_files
+```

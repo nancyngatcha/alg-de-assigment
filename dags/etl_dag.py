@@ -1,5 +1,6 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, when, lit, to_date
 from datetime import datetime, timedelta
@@ -31,30 +32,41 @@ dag = DAG(
     default_args=default_args,
     description="A scalable ETL pipeline for Shopify data using temporary files",
     schedule_interval="0 2 * * *",
+    )
+
+valid_S3_prefix = "s3://"
+bucket_name = "alg-data-public"
+
+s3_sensor = S3KeySensor(
+    task_id = f"check_extracted_file",
+    bucket_key = f"{valid_S3_prefix}/{bucket_name}/{execution_date}.csv",
+    wildcard_match = False,
+    aws_conn_id = 'aws_default',
+    dag = dag
 )
 
 download_data = PythonOperator(
-    task_id="extract",
-    python_callable=download_csv_from_s3,
-    op_kwargs={"execution_date": execution_date },
-    provide_context=True,
-    dag=dag,
+    task_id = "extract",
+    python_callable = download_csv_from_s3,
+    op_kwargs = {"execution_date": execution_date },
+    provide_context = True,
+    dag = dag,
 )
 
 transform_data = PythonOperator(
-    task_id="transform",
-    python_callable=transform,
-    op_kwargs={"execution_date": execution_date},
-    provide_context=True,
-    dag=dag,
+    task_id = "transform",
+    python_callable = transform,
+    op_kwargs = {"execution_date": execution_date},
+    provide_context = True,
+    dag = dag,
 )
 
 load_data = PythonOperator(
-    task_id="load",
-    python_callable=load_to_postgres,
-    op_kwargs={"execution_date": execution_date},
-    provide_context=True,
-    dag=dag,
+    task_id = "load",
+    python_callable = load_to_postgres,
+    op_kwargs = {"execution_date": execution_date},
+    provide_context = True,
+    dag = dag,
 )
 
-download_data >> transform_data >> load_data
+s3_sensor >> download_data >> transform_data >> load_data
